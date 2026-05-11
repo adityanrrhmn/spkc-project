@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalog Produk — SawahCerdas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+
+  .hero-bg { background: linear-gradient(135deg, #0d3321 0%, #14532d 50%, #15803d 100%); }
+
+  .card-hover { transition: transform 0.18s, box-shadow 0.18s; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.13); }
+
+  .btn-primary { background: linear-gradient(135deg, #16a34a, #15803d); color: white; border-radius: 10px; font-weight: 700; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: none; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(22,163,74,0.4); }
+
+  /* Placeholder image styles */
+  .placeholder-insektisida { background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+  .placeholder-fungisida   { background: linear-gradient(135deg, #fffbeb, #fef3c7); }
+  .placeholder-herbisida   { background: linear-gradient(135deg, #f0fdf4, #dcfce7); }
+
+  .badge-cat-insektisida { background:#fef2f2; color:#dc2626; border:1.5px solid #fca5a5; }
+  .badge-cat-fungisida   { background:#fffbeb; color:#d97706; border:1.5px solid #fcd34d; }
+  .badge-cat-herbisida   { background:#f0fdf4; color:#16a34a; border:1.5px solid #86efac; }
+
+  .badge-q1 { background:#fef2f2; color:#dc2626; }
+  .badge-q2 { background:#fff7ed; color:#ea580c; }
+  .badge-q3 { background:#fefce8; color:#ca8a04; }
+  .badge-q4 { background:#f0fdf4; color:#16a34a; }
+  .badge-q5 { background:#ecfdf5; color:#059669; }
+
+  .filter-tab { padding: 8px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; }
+  .filter-tab-active { background: #16a34a; color: white; border-color: #16a34a; }
+  .filter-tab-inactive { background: white; color: #64748b; border-color: #e2e8f0; }
+  .filter-tab-inactive:hover { border-color: #16a34a; color: #16a34a; }
+
+  .search-input { border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px 16px 10px 44px; font-size: 15px; width: 100%; outline: none; transition: border-color 0.2s; }
+  .search-input:focus { border-color: #16a34a; }
+
+  .product-card { display: flex; flex-direction: column; background: white; border-radius: 20px; border: 1px solid #f1f5f9; overflow: hidden; }
+
+  .star-filled { color: #f59e0b; }
+  .star-empty  { color: #e2e8f0; }
+
+  .nav-link { transition: color 0.15s; }
+  .nav-link:hover { color: #4ade80; }
+
+  .fade-in { animation: fadeIn 0.4s ease-in; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  #no-results { display:none; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="text-2xl">🌾</span>
+      <span class="text-white font-bold text-xl">SawahCerdas</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-slate-300 text-sm">
+      <a href="index.html" class="nav-link">Beranda</a>
+      <a href="katalog.html" class="text-green-400 font-semibold">Katalog Produk</a>
+      <a href="index.html#form-section" class="nav-link">Analisis</a>
+    </div>
+    <a href="index.html#form-section" class="btn-primary text-sm py-2 px-5">Mulai Analisis</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-bg pt-28 pb-14 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <p class="text-green-400 font-semibold text-sm uppercase tracking-wider mb-3">Database Lengkap</p>
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4">Katalog Produk<br>Pestisida Padi</h1>
+    <p class="text-slate-300 text-lg max-w-xl mx-auto mb-8">Seluruh produk yang tersedia dalam sistem rekomendasi — lengkap dengan kategori, kualitas, harga, dan spesifikasi teknis.</p>
+    <div class="flex flex-wrap justify-center gap-6 text-slate-400 text-sm">
+      <div><span class="text-white font-bold text-2xl" id="count-total">90</span> Total Produk</div>
+      <div><span class="text-red-400 font-bold text-2xl" id="count-insektisida">30</span> Insektisida</div>
+      <div><span class="text-amber-400 font-bold text-2xl" id="count-fungisida">30</span> Fungisida</div>
+      <div><span class="text-green-400 font-bold text-2xl" id="count-herbisida">30</span> Herbisida</div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="sticky top-14 z-40 bg-white border-b border-slate-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap gap-3 items-center">
+    <!-- Category tabs -->
+    <div class="flex flex-wrap gap-2">
+      <button class="filter-tab filter-tab-active" data-cat="semua" onclick="setFilter('semua')">Semua (90)</button>
+      <button class="filter-tab filter-tab-inactive" data-cat="Insektisida" onclick="setFilter('Insektisida')">🦟 Insektisida (30)</button>
+      <button class="filter-tab filter-tab-inactive" data-cat="Fungisida" onclick="setFilter('Fungisida')">🍄 Fungisida (30)</button>
+      <button class="filter-tab filter-tab-inactive" data-cat="Herbisida" onclick="setFilter('Herbisida')">🌿 Herbisida (30)</button>
+    </div>
+
+    <!-- Search -->
+    <div class="relative flex-1 min-w-48">
+      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-base">🔍</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Cari nama produk..." oninput="renderGrid()">
+    </div>
+
+    <!-- Sort -->
+    <select id="sort-select" class="border-2 border-slate-200 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 outline-none focus:border-green-500" onchange="renderGrid()">
+      <option value="nama-asc">Nama A–Z</option>
+      <option value="nama-desc">Nama Z–A</option>
+      <option value="harga-asc">Harga Termurah</option>
+      <option value="harga-desc">Harga Termahal</option>
+      <option value="kualitas-desc">Kualitas Terbaik</option>
+      <option value="kualitas-asc">Kualitas Terendah</option>
+    </select>
+  </div>
+</div>
+
+<!-- PRODUCT GRID -->
+<main class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Result count -->
+  <div class="flex items-center justify-between mb-6">
+    <p class="text-slate-500 text-sm" id="result-info">Menampilkan 90 produk</p>
+    <a href="index.html#form-section" class="btn-primary px-5 py-2.5 text-sm">🔬 Analisis Produk Terbaik →</a>
+  </div>
+
+  <!-- Grid -->
+  <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+
+  <!-- No results -->
+  <div id="no-results" class="text-center py-20">
+    <div class="text-6xl mb-4">🔍</div>
+    <h3 class="text-xl font-bold text-slate-600 mb-2">Produk tidak ditemukan</h3>
+    <p class="text-slate-400">Coba kata kunci lain atau hapus filter</p>
+    <button class="mt-4 btn-primary px-6 py-2.5 text-sm" onclick="clearSearch()">Tampilkan Semua</button>
+  </div>
+</main>
+
+<!-- CTA BOTTOM -->
+<section class="hero-bg py-12 px-4 mt-4">
+  <div class="max-w-2xl mx-auto text-center">
+    <h2 class="text-2xl font-bold text-white mb-3">Bingung Pilih yang Mana?</h2>
+    <p class="text-slate-300 mb-6">Gunakan sistem rekomendasi kami — masukkan kondisi sawah dan budget, kami yang carikan yang paling cocok.</p>
+    <a href="index.html#form-section" class="btn-primary text-base py-3.5 px-10 inline-block">🚀 Mulai Analisis Gratis</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-slate-900 text-slate-400 py-8 px-4 text-center">
+  <div class="flex items-center justify-center gap-2 mb-2">
+    <span class="text-xl">🌾</span>
+    <span class="text-white font-bold">SawahCerdas</span>
+  </div>
+  <p class="text-xs text-slate-600">Data produk dari katalog pestisida terdaftar. Konsultasikan dengan penyuluh pertanian setempat.</p>
+</footer>
+
+<script>
+// ============================================================
+// PRODUCT DATA
+// ============================================================
+const DOSIS_BY_Q = {1: 4, 2: 3, 3: 2, 4: 1.5, 5: 1};
+const EFF_BASE   = {1: 3.5, 2: 5.5, 3: 7, 4: 8.5, 5: 10};
+
+function mkProduct(id, nama, kategori, harga, kualitas, ml, effVariant, organik) {
+  const dosis    = DOSIS_BY_Q[kualitas];
+  const coverage = Math.round(ml / (dosis * 0.04));
+  const effVal   = Math.min(10, Math.max(2, EFF_BASE[kualitas] + (effVariant || 0)));
+  return { id, nama, kategori, harga, kualitas, ml, dosis_ml: dosis, coverage_area: coverage,
+    efektivitas: effVal, organik: !!organik };
+}
+
+const PRODUCTS = [
+  mkProduct('F01','Antracol',    'Fungisida',  65000,1,500,-0.5),
+  mkProduct('F02','Agrimec',     'Fungisida',  65000,2,500,0),
+  mkProduct('F03','Alcove',      'Fungisida', 180000,5,100,0,true),
+  mkProduct('F04','Astana',      'Fungisida',  65000,1,250,0.5),
+  mkProduct('F05','Basclaim',    'Fungisida',  65000,2,500,-0.5),
+  mkProduct('F06','Belt',        'Fungisida', 195000,5,100,0.5),
+  mkProduct('F07','Besconil',    'Fungisida', 190000,5,250,0),
+  mkProduct('F08','Confidor',    'Fungisida',  68000,1,500,0),
+  mkProduct('F09','Custodia',    'Fungisida', 120000,3,100,0.5),
+  mkProduct('F10','Cabrio Gold', 'Fungisida', 100000,3,100,-0.5),
+  mkProduct('F11','Dakozim',     'Fungisida',  70000,1,500,-0.5),
+  mkProduct('F12','Democel',     'Fungisida', 190000,5,250,-0.5),
+  mkProduct('F13','Endur',       'Fungisida', 175000,4,100,0.5),
+  mkProduct('F14','Folicur',     'Fungisida', 140000,4,250,0),
+  mkProduct('F15','Follcur Gold','Fungisida', 190000,5,100,0,true),
+  mkProduct('F16','Furi',        'Fungisida',  65000,1,500,0),
+  mkProduct('F17','Gandasil D',  'Fungisida', 100000,3,500,0),
+  mkProduct('F18','Golok',       'Fungisida',  72000,1,250,-0.5),
+  mkProduct('F19','Govin',       'Fungisida', 110000,3,250,0.5),
+  mkProduct('F20','Hexagol',     'Fungisida',  65000,2,500,0.5),
+  mkProduct('F21','Impact',      'Fungisida',  70000,2,250,-0.5),
+  mkProduct('F22','Losmine',     'Fungisida', 160000,4,500,0),
+  mkProduct('F23','Monalisa',    'Fungisida', 185000,5,250,-0.5),
+  mkProduct('F24','Novlect',     'Fungisida',  68000,1,500,0),
+  mkProduct('F25','Plenum',      'Fungisida', 130000,3,250,-0.5),
+  mkProduct('F26','Prima Hippo', 'Fungisida',  75000,2,250,0),
+  mkProduct('F27','Promin',      'Fungisida', 170000,4,500,0.5),
+  mkProduct('F28','Rexadan',     'Fungisida', 150000,4,100,-0.5),
+  mkProduct('F29','Score',       'Fungisida',  75000,2,500,0),
+  mkProduct('F30','Topsin',      'Fungisida', 175000,4,100,0),
+
+  mkProduct('I01','Amistartop',  'Insektisida', 70000,2,500,0),
+  mkProduct('I02','Amate',       'Insektisida', 65000,1,500,-0.5),
+  mkProduct('I03','Aspril',      'Insektisida', 80000,2,500,0.5),
+  mkProduct('I04','Belt',        'Insektisida',170000,4,250,0.5),
+  mkProduct('I05','Boom Flower', 'Insektisida',175000,4,100,0),
+  mkProduct('I06','Buprolord',   'Insektisida',180000,5,250,0,true),
+  mkProduct('I07','Cobra',       'Insektisida', 75000,1,500,0),
+  mkProduct('I08','Curakron',    'Insektisida',100000,3,250,0),
+  mkProduct('I09','Decis',       'Insektisida', 75000,2,500,-0.5),
+  mkProduct('I10','Dumil',       'Insektisida', 65000,2,500,0),
+  mkProduct('I11','Emacel',      'Insektisida',110000,3,100,0.5),
+  mkProduct('I12','Extratin',    'Insektisida', 65000,2,500,-0.5),
+  mkProduct('I13','Fiery',       'Insektisida',140000,4,100,0),
+  mkProduct('I14','Gandasil B',  'Insektisida',120000,3,100,-0.5),
+  mkProduct('I15','Hokran',      'Insektisida', 65000,2,250,0),
+  mkProduct('I16','Imunit',      'Insektisida',140000,4,500,0.5),
+  mkProduct('I17','Kelpak',      'Insektisida',185000,5,100,0.5),
+  mkProduct('I18','King Gib',    'Insektisida',175000,4,100,-0.5),
+  mkProduct('I19','Lanidor',     'Insektisida',200000,5,100,0,true),
+  mkProduct('I20','Match',       'Insektisida', 70000,2,500,0),
+  mkProduct('I21','Nitrea',      'Insektisida',160000,4,250,0),
+  mkProduct('I22','Pegasus',     'Insektisida',195000,5,100,-0.5),
+  mkProduct('I23','Proclaim',    'Insektisida',180000,2,100,0),
+  mkProduct('I24','Prevathon',   'Insektisida', 65000,2,250,0.5),
+  mkProduct('I25','Regent Merah','Insektisida', 68000,1,250,0),
+  mkProduct('I26','Roul Up',     'Insektisida', 70000,1,250,-0.5),
+  mkProduct('I27','Round Up',    'Insektisida', 80000,2,250,0),
+  mkProduct('I28','Score',       'Insektisida', 80000,2,250,-0.5),
+  mkProduct('I29','Starlet',     'Insektisida',170000,4,100,0),
+  mkProduct('I30','Topban',      'Insektisida', 72000,1,500,0.5),
+
+  mkProduct('H01','Agil',          'Herbisida',170000,4,500,0),
+  mkProduct('H02','Alan Up',        'Herbisida', 65000,1,250,-0.5),
+  mkProduct('H03','Alupi',          'Herbisida',100000,3,100,0),
+  mkProduct('H04','Ambassador',     'Herbisida', 70000,2,500,0.5),
+  mkProduct('H05','Ally WG',        'Herbisida',130000,3,100,0),
+  mkProduct('H06','Athen',          'Herbisida', 72000,1,500,0),
+  mkProduct('H07','Basta',          'Herbisida',180000,5,100,0,true),
+  mkProduct('H08','Ca Bion',        'Herbisida',180000,5,500,0.5),
+  mkProduct('H09','Clean Top',      'Herbisida',190000,2,100,0),
+  mkProduct('H10','Extra Trubus',   'Herbisida',140000,4,100,0.5),
+  mkProduct('H11','Fuji Gib',       'Herbisida', 72000,1,250,0),
+  mkProduct('H12','Hippo',          'Herbisida',160000,4,250,-0.5),
+  mkProduct('H13','Kontak',         'Herbisida',195000,5,100,-0.5),
+  mkProduct('H14','Klodinat',       'Herbisida',110000,3,500,0.5),
+  mkProduct('H15','Orgibe Super',   'Herbisida',200000,5,100,0),
+  mkProduct('H16','Ojiro',          'Herbisida',100000,3,100,-0.5),
+  mkProduct('H17','Pilarquat',      'Herbisida',175000,4,500,0),
+  mkProduct('H18','Plenum',         'Herbisida',185000,5,100,0),
+  mkProduct('H19','Roundup',        'Herbisida',180000,5,250,-0.5),
+  mkProduct('H20','Touchdown',      'Herbisida', 75000,1,250,0),
+  mkProduct('H21','Umpro',          'Herbisida', 70000,2,500,0.5),
+  mkProduct('H22','Midador',        'Herbisida', 75000,1,250,-0.5),
+  mkProduct('H23','Gibgro',         'Herbisida',200000,5,100,0,true),
+  mkProduct('H24','Gavin',          'Herbisida',110000,3,250,0),
+  mkProduct('H25','Atrazine',       'Herbisida',110000,3,250,0.5),
+  mkProduct('H26','Prima Joss',     'Herbisida', 75000,2,500,0),
+  mkProduct('H27','Basta (Ekonomi)','Herbisida', 65000,1,500,0),
+  mkProduct('H28','Antasari',       'Herbisida',180000,5,100,0),
+  mkProduct('H29','Sidametrin',     'Herbisida', 70000,2,500,-0.5),
+  mkProduct('H30','Filia',          'Herbisida', 68000,1,500,0),
+];
+
+// ============================================================
+// FILTER STATE
+// ============================================================
+let activeFilter = 'semua';
+
+function setFilter(cat) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    if (btn.dataset.cat === cat) {
+      btn.className = 'filter-tab filter-tab-active';
+    } else {
+      btn.className = 'filter-tab filter-tab-inactive';
+    }
+  });
+  renderGrid();
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  setFilter('semua');
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+const CAT_ICON  = { Insektisida: '🦟', Fungisida: '🍄', Herbisida: '🌿' };
+const CAT_CLASS = { Insektisida: 'insektisida', Fungisida: 'fungisida', Herbisida: 'herbisida' };
+const Q_LABEL   = { 1:'Ekonomis', 2:'Standar', 3:'Menengah', 4:'Premium', 5:'Elite' };
+
+function fmtRp(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+function fmt(n)   { return Math.round(n).toLocaleString('id-ID'); }
+
+function stars(q) {
+  return Array.from({length: 5}, (_, i) =>
+    `<span class="${i < q ? 'star-filled' : 'star-empty'}">★</span>`
+  ).join('');
+}
+
+function renderGrid() {
+  const query  = document.getElementById('search-input').value.trim().toLowerCase();
+  const sort   = document.getElementById('sort-select').value;
+
+  let filtered = PRODUCTS.filter(p => {
+    const catOk  = activeFilter === 'semua' || p.kategori === activeFilter;
+    const nameOk = !query || p.nama.toLowerCase().includes(query);
+    return catOk && nameOk;
+  });
+
+  // Sort
+  filtered.sort((a, b) => {
+    switch (sort) {
+      case 'nama-asc':      return a.nama.localeCompare(b.nama);
+      case 'nama-desc':     return b.nama.localeCompare(a.nama);
+      case 'harga-asc':     return a.harga - b.harga;
+      case 'harga-desc':    return b.harga - a.harga;
+      case 'kualitas-desc': return b.kualitas - a.kualitas || a.nama.localeCompare(b.nama);
+      case 'kualitas-asc':  return a.kualitas - b.kualitas || a.nama.localeCompare(b.nama);
+      default:              return 0;
+    }
+  });
+
+  document.getElementById('result-info').textContent =
+    `Menampilkan ${filtered.length} produk${query ? ' untuk "' + query + '"' : ''}`;
+
+  const grid = document.getElementById('product-grid');
+  const noRes = document.getElementById('no-results');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    noRes.style.display = 'block';
+    return;
+  }
+  noRes.style.display = 'none';
+
+  grid.innerHTML = filtered.map(p => renderCard(p)).join('');
+}
+
+function renderCard(p) {
+  const catClass = CAT_CLASS[p.kategori];
+  const icon     = CAT_ICON[p.kategori];
+
+  return `
+  <div class="product-card card-hover shadow-sm">
+    <!-- Placeholder Image -->
+    <div class="placeholder-${catClass} relative flex flex-col items-center justify-center h-36 overflow-hidden">
+      <span class="text-5xl mb-1 select-none">${icon}</span>
+      <span class="text-xs font-semibold text-slate-500 opacity-70">${p.ml} mL</span>
+      ${p.organik ? '<span class="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">🌱 Organik</span>' : ''}
+      <span class="absolute top-2 left-2 badge-cat-${catClass} text-xs font-bold px-2 py-0.5 rounded-full border">${p.kategori}</span>
+    </div>
+
+    <!-- Info -->
+    <div class="p-4 flex flex-col flex-1">
+      <h3 class="font-bold text-slate-800 text-sm leading-tight mb-1">${p.nama}</h3>
+
+      <!-- Stars + quality label -->
+      <div class="flex items-center gap-1 mb-2">
+        <span class="text-xs leading-none">${stars(p.kualitas)}</span>
+        <span class="badge-q${p.kualitas} text-xs font-semibold px-1.5 py-0.5 rounded-full ml-1">${Q_LABEL[p.kualitas]}</span>
+      </div>
+
+      <!-- Price (prominent) -->
+      <div class="text-green-700 font-extrabold text-base mb-3">${fmtRp(p.harga)}</div>
+
+      <!-- Specs grid -->
+      <div class="mt-auto grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-slate-500 border-t border-slate-100 pt-3">
+        <span class="text-slate-400">Volume</span>
+        <span class="font-semibold text-slate-600 text-right">${p.ml} mL</span>
+
+        <span class="text-slate-400">Jangkauan</span>
+        <span class="font-semibold text-slate-600 text-right">${fmt(p.coverage_area)} m²</span>
+
+        <span class="text-slate-400">Dosis</span>
+        <span class="font-semibold text-slate-600 text-right">${p.dosis_ml} mL/L</span>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderGrid();
+</script>
+</body>
+</html>

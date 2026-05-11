@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SawahCerdas — Sistem Rekomendasi Pestisida Padi Cerdas</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+  .hero-bg { background: linear-gradient(135deg, #0d3321 0%, #14532d 40%, #166534 70%, #15803d 100%); }
+  .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+  .slider-thumb::-webkit-slider-thumb { width: 22px; height: 22px; border-radius: 50%; background: #16a34a; cursor: pointer; -webkit-appearance: none; box-shadow: 0 2px 6px rgba(22,163,74,0.4); }
+  .slider-thumb::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #16a34a; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(22,163,74,0.4); }
+  .slider-thumb { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 3px; background: #e2e8f0; outline: none; }
+  .score-bar { transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .fade-in { animation: fadeIn 0.5s ease-in; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .badge-q1 { background:#fef2f2; color:#dc2626; }
+  .badge-q2 { background:#fff7ed; color:#ea580c; }
+  .badge-q3 { background:#fefce8; color:#ca8a04; }
+  .badge-q4 { background:#f0fdf4; color:#16a34a; }
+  .badge-q5 { background:#ecfdf5; color:#059669; }
+  .rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+  .rank-3 { background: linear-gradient(135deg, #cd7c2d, #92400e); }
+  .topsis-table td, .topsis-table th { padding: 8px 12px; font-size: 12px; border: 1px solid #e2e8f0; }
+  .topsis-table th { background: #f8fafc; font-weight: 600; }
+  details > summary { cursor: pointer; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  .nav-link { transition: color 0.15s; }
+  .nav-link:hover { color: #4ade80; }
+  .form-input { border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; width: 100%; font-size: 15px; transition: border-color 0.2s; outline: none; }
+  .form-input:focus { border-color: #16a34a; }
+  .btn-primary { background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 14px 32px; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: none; display: inline-block; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(22,163,74,0.4); }
+  .btn-primary:active { transform: translateY(0); }
+  .category-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  .chip-active { background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; }
+  .chip-inactive { background: #f1f5f9; color: #94a3b8; border: 1.5px solid #e2e8f0; text-decoration: line-through; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- NAVBAR -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🌾</span>
+      <span class="text-white font-bold text-xl">SawahCerdas</span>
+      <span class="hidden sm:block text-green-400 text-xs font-semibold bg-green-900/40 px-2 py-0.5 rounded-full ml-1">Rekomendasi AI</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-slate-300 text-sm">
+      <a href="#cara-kerja" class="nav-link">Cara Kerja</a>
+      <a href="katalog.html" class="nav-link">Katalog Produk</a>
+      <a href="#form-section" class="nav-link">Analisis</a>
+      <a href="#faq" class="nav-link">FAQ</a>
+    </div>
+    <a href="#form-section" class="btn-primary text-sm py-2 px-5">Mulai Sekarang</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-bg pt-24 pb-20 px-4 relative overflow-hidden">
+  <div class="absolute inset-0 opacity-10" style="background-image:url('data:image/svg+xml,<svg width=%2260%22 height=%2260%22 xmlns=%22http://www.w3.org/2000/svg%22><path d=%22M30 5 L55 50 L5 50 Z%22 fill=%22%2322c55e%22 opacity=%220.3%22/></svg>'); background-size: 80px;"></div>
+  <div class="max-w-5xl mx-auto text-center relative z-10">
+    <div class="inline-flex items-center gap-2 bg-green-900/50 border border-green-600/40 text-green-300 text-sm font-semibold px-4 py-2 rounded-full mb-6">
+      <span>🧠</span> Teknologi AI Rekomendasi Cerdas
+    </div>
+    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-tight mb-6">
+      Temukan Pestisida<br><span class="text-green-400">Terbaik untuk Sawah</span><br>Padi Anda
+    </h1>
+    <p class="text-slate-300 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+      Sistem AI yang menganalisis kondisi serangan hama, anggaran, dan luas lahan Anda — lalu merekomendasikan produk pestisida yang paling tepat secara otomatis.
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="#form-section" class="btn-primary text-lg py-4 px-10">🔬 Analisis Sekarang</a>
+      <a href="#cara-kerja" class="bg-white/10 hover:bg-white/20 text-white font-semibold py-4 px-8 rounded-xl border border-white/20 cursor-pointer transition-colors">Lihat Cara Kerja →</a>
+    </div>
+    <div class="mt-12 flex flex-wrap justify-center gap-8 text-slate-400 text-sm">
+      <div class="flex items-center gap-2"><span class="text-green-400 font-bold text-lg">90</span> Produk Pestisida</div>
+      <div class="flex items-center gap-2"><span class="text-green-400 font-bold text-lg">3</span> Kategori</div>
+      <div class="flex items-center gap-2"><span class="text-green-400 font-bold text-lg">8</span> Kriteria Analisis</div>
+      <div class="flex items-center gap-2"><span class="text-green-400 font-bold text-lg">100%</span> Kalkulasi Real</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section class="py-16 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12">
+      <p class="text-green-600 font-semibold text-sm uppercase tracking-wider mb-2">Masalah Petani Padi</p>
+      <h2 class="text-3xl font-bold text-slate-800">Terlalu Banyak Pilihan, Sulit Memutuskan?</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-red-50 border border-red-100 rounded-2xl p-6 card-hover">
+        <div class="text-4xl mb-4">🦟</div>
+        <h3 class="font-bold text-slate-800 text-lg mb-2">Serangan Hama Serangga</h3>
+        <p class="text-slate-600 text-sm leading-relaxed">Wereng, penggerek batang, dan ulat daun merusak panen. Salah pilih insektisida = biaya tinggi, hasil buruk.</p>
+        <div class="mt-4 text-red-600 text-xs font-semibold bg-red-100 px-3 py-1.5 rounded-full inline-block">Kerugian hingga 80% panen</div>
+      </div>
+      <div class="bg-amber-50 border border-amber-100 rounded-2xl p-6 card-hover">
+        <div class="text-4xl mb-4">🍄</div>
+        <h3 class="font-bold text-slate-800 text-lg mb-2">Penyakit Jamur & Blast</h3>
+        <p class="text-slate-600 text-sm leading-relaxed">Blas daun, hawar batang, dan karat daun menyebar cepat di musim hujan. Fungisida yang tepat jadi kunci.</p>
+        <div class="mt-4 text-amber-600 text-xs font-semibold bg-amber-100 px-3 py-1.5 rounded-full inline-block">Menyebar dalam 3–5 hari</div>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 card-hover">
+        <div class="text-4xl mb-4">🌿</div>
+        <h3 class="font-bold text-slate-800 text-lg mb-2">Gulma Persaingan Nutrisi</h3>
+        <p class="text-slate-600 text-sm leading-relaxed">Rumput liar dan eceng gondok menyerap pupuk dan air. Herbisida salah bisa merusak tanaman padi sendiri.</p>
+        <div class="mt-4 text-emerald-600 text-xs font-semibold bg-emerald-100 px-3 py-1.5 rounded-full inline-block">Kurangi hasil 20–40%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CARA KERJA -->
+<section id="cara-kerja" class="py-16 px-4 bg-slate-50">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12">
+      <p class="text-green-600 font-semibold text-sm uppercase tracking-wider mb-2">Metode Ilmiah</p>
+      <h2 class="text-3xl font-bold text-slate-800">Bagaimana Sistem Bekerja?</h2>
+      <p class="text-slate-500 mt-3 max-w-xl mx-auto">Kombinasi 4 metode AI untuk hasil rekomendasi yang akurat dan transparan</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 card-hover">
+        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-xl mb-4">📝</div>
+        <div class="text-blue-600 text-xs font-bold uppercase tracking-wider mb-1">Langkah 1</div>
+        <h3 class="font-bold text-slate-800 mb-2">Input Kondisi Sawah</h3>
+        <p class="text-slate-500 text-sm">Masukkan tingkat serangan serangga, jamur, gulma, budget, dan luas lahan.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 card-hover">
+        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-xl mb-4">⚙️</div>
+        <div class="text-orange-600 text-xs font-bold uppercase tracking-wider mb-1">Langkah 2</div>
+        <h3 class="font-bold text-slate-800 mb-2">Filter Otomatis</h3>
+        <p class="text-slate-500 text-sm">Hanya produk yang relevan dengan masalah Anda yang akan dievaluasi. Produk tidak relevan otomatis diabaikan.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 card-hover">
+        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center text-xl mb-4">📊</div>
+        <div class="text-purple-600 text-xs font-bold uppercase tracking-wider mb-1">Langkah 3</div>
+        <h3 class="font-bold text-slate-800 mb-2">Penilaian Produk</h3>
+        <p class="text-slate-500 text-sm">Setiap produk dinilai dari efektivitas, kualitas, luas jangkauan, harga, dan dosis — lalu diurutkan dari yang terbaik.</p>
+      </div>
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 card-hover">
+        <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-xl mb-4">💰</div>
+        <div class="text-green-600 text-xs font-bold uppercase tracking-wider mb-1">Langkah 4</div>
+        <h3 class="font-bold text-slate-800 mb-2">Kalkulasi Biaya</h3>
+        <p class="text-slate-500 text-sm">Sistem menghitung quantity kebutuhan dan estimasi biaya total 1 musim tanam.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM INPUT -->
+<section id="form-section" class="py-16 px-4 bg-white">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-10">
+      <p class="text-green-600 font-semibold text-sm uppercase tracking-wider mb-2">Analisis Sekarang</p>
+      <h2 class="text-3xl font-bold text-slate-800">Kondisi Sawah Padi Anda</h2>
+      <p class="text-slate-500 mt-3">Geser slider sesuai kondisi aktual. Sistem akan memfilter dan meranking secara otomatis.</p>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-xl border border-slate-100 p-8">
+      <!-- Active Categories Preview -->
+      <div class="mb-8 p-4 bg-slate-50 rounded-2xl">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Produk yang Akan Dianalisis</p>
+        <div class="flex flex-wrap gap-2" id="category-chips">
+          <span class="category-chip chip-inactive" id="chip-insektisida">🦟 Insektisida</span>
+          <span class="category-chip chip-inactive" id="chip-fungisida">🍄 Fungisida</span>
+          <span class="category-chip chip-inactive" id="chip-herbisida">🌿 Herbisida</span>
+        </div>
+        <div class="mt-2 text-xs text-slate-400" id="filter-hint">Geser slider di bawah untuk mengaktifkan kategori</div>
+      </div>
+
+      <!-- Sliders -->
+      <div class="space-y-8">
+        <!-- Serangga -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <label class="font-semibold text-slate-700 flex items-center gap-2">🦟 Tingkat Serangan Serangga</label>
+              <p class="text-xs text-slate-400 mt-0.5">Wereng, penggerek batang, ulat, dll.</p>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-extrabold text-green-600" id="val-serangga">0</span>
+              <span class="text-slate-400 text-sm">/5</span>
+              <div class="text-xs font-medium" id="label-serangga" style="color:#94a3b8">Tidak ada</div>
+            </div>
+          </div>
+          <input type="range" min="0" max="5" value="0" step="1" class="slider-thumb w-full" id="slider-serangga" oninput="updateSlider('serangga', this.value)">
+          <div class="flex justify-between text-xs text-slate-300 mt-1"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <!-- Jamur -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <label class="font-semibold text-slate-700 flex items-center gap-2">🍄 Tingkat Serangan Jamur/Penyakit</label>
+              <p class="text-xs text-slate-400 mt-0.5">Blas, hawar batang, karat daun, dll.</p>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-extrabold text-green-600" id="val-jamur">0</span>
+              <span class="text-slate-400 text-sm">/5</span>
+              <div class="text-xs font-medium" id="label-jamur" style="color:#94a3b8">Tidak ada</div>
+            </div>
+          </div>
+          <input type="range" min="0" max="5" value="0" step="1" class="slider-thumb w-full" id="slider-jamur" oninput="updateSlider('jamur', this.value)">
+          <div class="flex justify-between text-xs text-slate-300 mt-1"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <!-- Gulma -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <label class="font-semibold text-slate-700 flex items-center gap-2">🌿 Tingkat Gulma</label>
+              <p class="text-xs text-slate-400 mt-0.5">Rumput liar, eceng gondok, teki, dll.</p>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-extrabold text-green-600" id="val-gulma">0</span>
+              <span class="text-slate-400 text-sm">/5</span>
+              <div class="text-xs font-medium" id="label-gulma" style="color:#94a3b8">Tidak ada</div>
+            </div>
+          </div>
+          <input type="range" min="0" max="5" value="0" step="1" class="slider-thumb w-full" id="slider-gulma" oninput="updateSlider('gulma', this.value)">
+          <div class="flex justify-between text-xs text-slate-300 mt-1"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <!-- Luas Lahan -->
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">📐 Luas Lahan</label>
+          <p class="text-xs text-slate-400 mb-2">Masukkan luas sawah yang akan dirawat</p>
+          <div class="flex gap-2">
+            <input type="number" id="input-luas" class="form-input flex-1" placeholder="Contoh: 5000" min="100" max="100000" value="5000">
+            <select id="unit-luas" class="form-input w-28">
+              <option value="1">m²</option>
+              <option value="10000">Hektar</option>
+            </select>
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="luas-display">= 5.000 m² (0.50 ha)</p>
+        </div>
+
+        <!-- Budget -->
+        <div>
+          <label class="font-semibold text-slate-700 block mb-1">💰 Budget Pestisida</label>
+          <p class="text-xs text-slate-400 mb-2">Total anggaran yang tersedia untuk 1 musim tanam</p>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">Rp</span>
+            <input type="number" id="input-budget" class="form-input pl-10" placeholder="Contoh: 500000" min="0" value="500000">
+          </div>
+          <p class="text-xs text-slate-400 mt-1" id="budget-display">= Rp 500.000</p>
+        </div>
+      </div>
+
+      <!-- Dynamic Weight Preview -->
+      <div class="mt-8 p-4 bg-slate-50 rounded-2xl" id="weight-preview" style="display:none">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Prioritas Analisis Berdasarkan Masalah Anda</p>
+        <div class="space-y-2" id="weight-bars"></div>
+      </div>
+
+      <!-- Submit -->
+      <div class="mt-8 text-center">
+        <button class="btn-primary text-lg py-4 px-12" onclick="runAnalysis()">
+          🔬 Analisis & Rekomendasikan
+        </button>
+        <p class="text-xs text-slate-400 mt-3">Semua perhitungan dilakukan secara lokal, real-time</p>
+      </div>
+
+      <!-- Validation message -->
+      <div id="validation-msg" class="mt-4 text-center text-red-500 text-sm font-medium" style="display:none">
+        ⚠️ Minimal satu tingkat serangan harus lebih dari 0
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HASIL REKOMENDASI -->
+<section id="hasil-section" class="py-16 px-4 bg-slate-50" style="display:none">
+  <div class="max-w-6xl mx-auto">
+    <!-- Summary Stats -->
+    <div class="text-center mb-10">
+      <p class="text-green-600 font-semibold text-sm uppercase tracking-wider mb-2">Hasil Analisis</p>
+      <h2 class="text-3xl font-bold text-slate-800">Rekomendasi Pestisida Anda</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10" id="summary-stats"></div>
+
+    <!-- Per-category results -->
+    <div id="category-results" class="space-y-10"></div>
+
+    <!-- Total Cost Summary -->
+    <div class="mt-10 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm" id="cost-summary"></div>
+
+    <!-- TOPSIS Detail -->
+    <div class="mt-10" id="topsis-detail"></div>
+
+    <!-- Product Comparison Table -->
+    <div class="mt-10 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm overflow-x-auto" id="comparison-table"></div>
+
+    <!-- Re-analyze button -->
+    <div class="mt-10 text-center">
+      <button class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-8 rounded-xl transition-colors" onclick="scrollToForm()">
+        ← Ubah Input & Analisis Ulang
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="py-16 px-4 bg-white">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-10">
+      <p class="text-green-600 font-semibold text-sm uppercase tracking-wider mb-2">FAQ</p>
+      <h2 class="text-3xl font-bold text-slate-800">Pertanyaan Umum</h2>
+    </div>
+    <div class="space-y-3" id="faq-list"></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 px-4 hero-bg">
+  <div class="max-w-3xl mx-auto text-center">
+    <h2 class="text-3xl font-bold text-white mb-4">Siap Mengoptimalkan Hasil Panen?</h2>
+    <p class="text-slate-300 mb-8 text-lg">Analisis gratis. Hasil instan. Rekomendasi tepat untuk sawah Anda.</p>
+    <a href="#form-section" class="btn-primary text-lg py-4 px-12 inline-block">🚀 Mulai Analisis Gratis</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-slate-900 text-slate-400 py-10 px-4 text-center">
+  <div class="flex items-center justify-center gap-2 mb-3">
+    <span class="text-2xl">🌾</span>
+    <span class="text-white font-bold text-lg">SawahCerdas</span>
+  </div>
+  <p class="text-sm">Sistem Rekomendasi Pestisida Padi Cerdas — Bantu petani pilih produk yang paling tepat</p>
+  <p class="text-xs mt-2 text-slate-600">Data produk dari katalog pestisida terdaftar. Konsultasikan dengan penyuluh pertanian setempat.</p>
+</footer>
+
+<script>
+// ============================================================
+// PRODUCT DATA — derived from Excel: Data Pestisida (Benar).xlsx
+// ============================================================
+const DOSIS_BY_Q = {1: 4, 2: 3, 3: 2, 4: 1.5, 5: 1};
+const EFF_BASE = {1: 3.5, 2: 5.5, 3: 7, 4: 8.5, 5: 10};
+const SPRAY_L_PER_M2 = 0.04;
+
+function mkProduct(id, nama, kategori, harga, kualitas, ml, effVariant, organik) {
+  const dosis = DOSIS_BY_Q[kualitas];
+  const coverage = Math.round(ml / (dosis * SPRAY_L_PER_M2));
+  const effVal = Math.min(10, Math.max(2, EFF_BASE[kualitas] + (effVariant || 0)));
+  return {
+    id, nama, kategori, harga, kualitas, ml,
+    dosis_ml: dosis,
+    coverage_area: coverage,
+    efektivitas_serangga: kategori === 'Insektisida' ? effVal : (kategori === 'Fungisida' ? 1.5 : 0),
+    efektivitas_jamur: kategori === 'Fungisida' ? effVal : (kategori === 'Insektisida' ? 1.5 : 0),
+    efektivitas_gulma: kategori === 'Herbisida' ? effVal : 0,
+    stok: true,
+    organik: !!organik
+  };
+}
+
+// Variant: -1, 0, +1 for variation within same quality tier
+const PRODUCTS = [
+  // FUNGISIDA
+  mkProduct('F01','Antracol','Fungisida',65000,1,500,-0.5),
+  mkProduct('F02','Agrimec','Fungisida',65000,2,500,0),
+  mkProduct('F03','Alcove','Fungisida',180000,5,100,0,true),
+  mkProduct('F04','Astana','Fungisida',65000,1,250,0.5),
+  mkProduct('F05','Basclaim','Fungisida',65000,2,500,-0.5),
+  mkProduct('F06','Belt','Fungisida',195000,5,100,0.5),
+  mkProduct('F07','Besconil','Fungisida',190000,5,250,0),
+  mkProduct('F08','Confidor','Fungisida',68000,1,500,0),
+  mkProduct('F09','Custodia','Fungisida',120000,3,100,0.5),
+  mkProduct('F10','Cabrio Gold','Fungisida',100000,3,100,-0.5),
+  mkProduct('F11','Dakozim','Fungisida',70000,1,500,-0.5),
+  mkProduct('F12','Democel','Fungisida',190000,5,250,-0.5),
+  mkProduct('F13','Endur','Fungisida',175000,4,100,0.5),
+  mkProduct('F14','Folicur','Fungisida',140000,4,250,0),
+  mkProduct('F15','Follcur Gold','Fungisida',190000,5,100,0,true),
+  mkProduct('F16','Furi','Fungisida',65000,1,500,0),
+  mkProduct('F17','Gandasil D','Fungisida',100000,3,500,0),
+  mkProduct('F18','Golok','Fungisida',72000,1,250,-0.5),
+  mkProduct('F19','Govin','Fungisida',110000,3,250,0.5),
+  mkProduct('F20','Hexagol','Fungisida',65000,2,500,0.5),
+  mkProduct('F21','Impact','Fungisida',70000,2,250,-0.5),
+  mkProduct('F22','Losmine','Fungisida',160000,4,500,0),
+  mkProduct('F23','Monalisa','Fungisida',185000,5,250,-0.5),
+  mkProduct('F24','Novlect','Fungisida',68000,1,500,0),
+  mkProduct('F25','Plenum','Fungisida',130000,3,250,-0.5),
+  mkProduct('F26','Prima Hippo','Fungisida',75000,2,250,0),
+  mkProduct('F27','Promin','Fungisida',170000,4,500,0.5),
+  mkProduct('F28','Rexadan','Fungisida',150000,4,100,-0.5),
+  mkProduct('F29','Score','Fungisida',75000,2,500,0),
+  mkProduct('F30','Topsin','Fungisida',175000,4,100,0),
+  // INSEKTISIDA
+  mkProduct('I01','Amistartop','Insektisida',70000,2,500,0),
+  mkProduct('I02','Amate','Insektisida',65000,1,500,-0.5),
+  mkProduct('I03','Aspril','Insektisida',80000,2,500,0.5),
+  mkProduct('I04','Belt','Insektisida',170000,4,250,0.5),
+  mkProduct('I05','Boom Flower','Insektisida',175000,4,100,0),
+  mkProduct('I06','Buprolord','Insektisida',180000,5,250,0,true),
+  mkProduct('I07','Cobra','Insektisida',75000,1,500,0),
+  mkProduct('I08','Curakron','Insektisida',100000,3,250,0),
+  mkProduct('I09','Decis','Insektisida',75000,2,500,-0.5),
+  mkProduct('I10','Dumil','Insektisida',65000,2,500,0),
+  mkProduct('I11','Emacel','Insektisida',110000,3,100,0.5),
+  mkProduct('I12','Extratin','Insektisida',65000,2,500,-0.5),
+  mkProduct('I13','Fiery','Insektisida',140000,4,100,0),
+  mkProduct('I14','Gandasil B','Insektisida',120000,3,100,-0.5),
+  mkProduct('I15','Hokran','Insektisida',65000,2,250,0),
+  mkProduct('I16','Imunit','Insektisida',140000,4,500,0.5),
+  mkProduct('I17','Kelpak','Insektisida',185000,5,100,0.5),
+  mkProduct('I18','King Gib','Insektisida',175000,4,100,-0.5),
+  mkProduct('I19','Lanidor','Insektisida',200000,5,100,0,true),
+  mkProduct('I20','Match','Insektisida',70000,2,500,0),
+  mkProduct('I21','Nitrea','Insektisida',160000,4,250,0),
+  mkProduct('I22','Pegasus','Insektisida',195000,5,100,-0.5),
+  mkProduct('I23','Proclaim','Insektisida',180000,2,100,0),
+  mkProduct('I24','Prevathon','Insektisida',65000,2,250,0.5),
+  mkProduct('I25','Regent Merah','Insektisida',68000,1,250,0),
+  mkProduct('I26','Roul Up','Insektisida',70000,1,250,-0.5),
+  mkProduct('I27','Round Up','Insektisida',80000,2,250,0),
+  mkProduct('I28','Score','Insektisida',80000,2,250,-0.5),
+  mkProduct('I29','Starlet','Insektisida',170000,4,100,0),
+  mkProduct('I30','Topban','Insektisida',72000,1,500,0.5),
+  // HERBISIDA
+  mkProduct('H01','Agil','Herbisida',170000,4,500,0),
+  mkProduct('H02','Alan Up','Herbisida',65000,1,250,-0.5),
+  mkProduct('H03','Alupi','Herbisida',100000,3,100,0),
+  mkProduct('H04','Ambassador','Herbisida',70000,2,500,0.5),
+  mkProduct('H05','Ally WG','Herbisida',130000,3,100,0),
+  mkProduct('H06','Athen','Herbisida',72000,1,500,0),
+  mkProduct('H07','Basta','Herbisida',180000,5,100,0,true),
+  mkProduct('H08','Ca Bion','Herbisida',180000,5,500,0.5),
+  mkProduct('H09','Clean Top','Herbisida',190000,2,100,0),
+  mkProduct('H10','Extra Trubus','Herbisida',140000,4,100,0.5),
+  mkProduct('H11','Fuji Gib','Herbisida',72000,1,250,0),
+  mkProduct('H12','Hippo','Herbisida',160000,4,250,-0.5),
+  mkProduct('H13','Kontak','Herbisida',195000,5,100,-0.5),
+  mkProduct('H14','Klodinat','Herbisida',110000,3,500,0.5),
+  mkProduct('H15','Orgibe Super','Herbisida',200000,5,100,0),
+  mkProduct('H16','Ojiro','Herbisida',100000,3,100,-0.5),
+  mkProduct('H17','Pilarquat','Herbisida',175000,4,500,0),
+  mkProduct('H18','Plenum','Herbisida',185000,5,100,0),
+  mkProduct('H19','Roundup','Herbisida',180000,5,250,-0.5),
+  mkProduct('H20','Touchdown','Herbisida',75000,1,250,0),
+  mkProduct('H21','Umpro','Herbisida',70000,2,500,0.5),
+  mkProduct('H22','Midador','Herbisida',75000,1,250,-0.5),
+  mkProduct('H23','Gibgro','Herbisida',200000,5,100,0,true),
+  mkProduct('H24','Gavin','Herbisida',110000,3,250,0),
+  mkProduct('H25','Atrazine','Herbisida',110000,3,250,0.5),
+  mkProduct('H26','Prima Joss','Herbisida',75000,2,500,0),
+  mkProduct('H27','Basta (Ekonomi)','Herbisida',65000,1,500,0),
+  mkProduct('H28','Antasari','Herbisida',180000,5,100,0),
+  mkProduct('H29','Sidametrin','Herbisida',70000,2,500,-0.5),
+  mkProduct('H30','Filia','Herbisida',68000,1,500,0),
+];
+
+// ============================================================
+// ENGINE
+// ============================================================
+
+function getActiveCats(inp) {
+  const cats = [];
+  if (inp.serangga > 0) cats.push('Insektisida');
+  if (inp.jamur > 0) cats.push('Fungisida');
+  if (inp.gulma > 0) cats.push('Herbisida');
+  return cats;
+}
+
+function getDynamicWeights(inp, cat) {
+  const sev = cat === 'Insektisida' ? inp.serangga : cat === 'Fungisida' ? inp.jamur : inp.gulma;
+  const sevNorm = sev / 5;
+  const wEff = 0.30 + 0.20 * sevNorm;
+  const rem = 1 - wEff;
+  return {
+    efektivitas: wEff,
+    kualitas: rem * 0.35,
+    coverage_area: rem * 0.25,
+    harga: rem * 0.30,
+    dosis_ml: rem * 0.10,
+  };
+}
+
+function getEffKey(cat) {
+  if (cat === 'Insektisida') return 'efektivitas_serangga';
+  if (cat === 'Fungisida') return 'efektivitas_jamur';
+  return 'efektivitas_gulma';
+}
+
+function runTOPSIS(products, cat, severity) {
+  const effKey = getEffKey(cat);
+  const weights = getDynamicWeights({ serangga: cat==='Insektisida'?severity:0, jamur: cat==='Fungisida'?severity:0, gulma: cat==='Herbisida'?severity:0 }, cat);
+
+  // Criteria definition: benefit = higher is better, cost = lower is better
+  const criteria = [
+    { key: effKey,         type: 'benefit', weight: weights.efektivitas  },
+    { key: 'kualitas',     type: 'benefit', weight: weights.kualitas     },
+    { key: 'coverage_area',type: 'benefit', weight: weights.coverage_area},
+    { key: 'harga',        type: 'cost',    weight: weights.harga        },
+    { key: 'dosis_ml',     type: 'cost',    weight: weights.dosis_ml     },
+  ];
+
+  // 1. Decision matrix
+  const matrix = products.map(p => criteria.map(c => p[c.key]));
+
+  // 2. Normalize (vector normalization)
+  const colNorms = criteria.map((_, j) =>
+    Math.sqrt(matrix.reduce((s, row) => s + row[j] ** 2, 0))
+  );
+  const normalized = matrix.map(row =>
+    row.map((v, j) => colNorms[j] > 0 ? v / colNorms[j] : 0)
+  );
+
+  // 3. Weighted normalization
+  const weighted = normalized.map(row =>
+    row.map((v, j) => v * criteria[j].weight)
+  );
+
+  // 4 & 5. Ideal solutions
+  const idealPos = criteria.map((c, j) => {
+    const vals = weighted.map(r => r[j]);
+    return c.type === 'benefit' ? Math.max(...vals) : Math.min(...vals);
+  });
+  const idealNeg = criteria.map((c, j) => {
+    const vals = weighted.map(r => r[j]);
+    return c.type === 'benefit' ? Math.min(...vals) : Math.max(...vals);
+  });
+
+  // 6 & 7. Distances and preference scores
+  const results = weighted.map((row, i) => {
+    const dPos = Math.sqrt(row.reduce((s, v, j) => s + (v - idealPos[j]) ** 2, 0));
+    const dNeg = Math.sqrt(row.reduce((s, v, j) => s + (v - idealNeg[j]) ** 2, 0));
+    const score = dPos + dNeg > 0 ? dNeg / (dPos + dNeg) : 0;
+    return {
+      product: products[i],
+      score: score,
+      dPos, dNeg,
+      normalizedRow: normalized[i],
+      weightedRow: weighted[i],
+      rank: 0
+    };
+  });
+
+  results.sort((a, b) => b.score - a.score);
+  results.forEach((r, i) => r.rank = i + 1);
+  return { results, criteria, idealPos, idealNeg, weights, matrix, normalized, weighted };
+}
+
+function getFrequency(severity) {
+  if (severity <= 2) return 1;
+  if (severity <= 4) return 2;
+  return 3;
+}
+
+function calculateQuantity(product, luas_m2, severity) {
+  const freq = getFrequency(severity);
+  const botolPerAplikasi = Math.ceil(luas_m2 / product.coverage_area);
+  const totalBotol = botolPerAplikasi * freq;
+  const totalMl = totalBotol * product.ml;
+  const totalBiaya = totalBotol * product.harga;
+  return { freq, botolPerAplikasi, totalBotol, totalMl, totalBiaya };
+}
+
+function runAnalysis() {
+  const serangga = parseInt(document.getElementById('slider-serangga').value);
+  const jamur    = parseInt(document.getElementById('slider-jamur').value);
+  const gulma    = parseInt(document.getElementById('slider-gulma').value);
+  const luasRaw  = parseFloat(document.getElementById('input-luas').value) || 5000;
+  const unit     = parseFloat(document.getElementById('unit-luas').value);
+  const luas     = luasRaw * unit;
+  const budget   = parseFloat(document.getElementById('input-budget').value) || 0;
+  const inp = { serangga, jamur, gulma, luas, budget };
+
+  document.getElementById('validation-msg').style.display = 'none';
+  if (serangga === 0 && jamur === 0 && gulma === 0) {
+    document.getElementById('validation-msg').style.display = 'block';
+    return;
+  }
+
+  const cats = getActiveCats(inp);
+  const catResults = cats.map(cat => {
+    const catProducts = PRODUCTS.filter(p => p.kategori === cat);
+    const sev = cat === 'Insektisida' ? serangga : cat === 'Fungisida' ? jamur : gulma;
+    const topsis = runTOPSIS(catProducts, cat, sev);
+    const top = topsis.results[0];
+    const qty = calculateQuantity(top.product, luas, sev);
+    return { cat, sev, topsis, qty, luas };
+  });
+
+  displayResults(catResults, inp);
+  document.getElementById('hasil-section').style.display = 'block';
+  document.getElementById('hasil-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ============================================================
+// UI RENDERING
+// ============================================================
+
+const SEV_LABELS = ['Tidak ada','Sangat Ringan','Ringan','Sedang','Berat','Sangat Berat'];
+const SEV_COLORS = ['#94a3b8','#22c55e','#84cc16','#f59e0b','#ef4444','#dc2626'];
+const CAT_ICONS = { Insektisida:'🦟', Fungisida:'🍄', Herbisida:'🌿' };
+const CAT_COLORS = { Insektisida:'red', Fungisida:'amber', Herbisida:'emerald' };
+
+function updateSlider(type, val) {
+  val = parseInt(val);
+  document.getElementById('val-' + type).textContent = val;
+  const lbl = document.getElementById('label-' + type);
+  lbl.textContent = SEV_LABELS[val];
+  lbl.style.color = SEV_COLORS[val];
+
+  // Update chip
+  const chipMap = { serangga:'insektisida', jamur:'fungisida', gulma:'herbisida' };
+  const chip = document.getElementById('chip-' + chipMap[type]);
+  if (val > 0) {
+    chip.className = 'category-chip chip-active';
+  } else {
+    chip.className = 'category-chip chip-inactive';
+  }
+
+  // Update filter hint
+  const s = parseInt(document.getElementById('slider-serangga').value);
+  const j = parseInt(document.getElementById('slider-jamur').value);
+  const g = parseInt(document.getElementById('slider-gulma').value);
+  const total = s + j + g;
+  if (total > 0) {
+    document.getElementById('filter-hint').textContent =
+      `Bobot: Insektisida ${(s/total*100).toFixed(0)}% | Fungisida ${(j/total*100).toFixed(0)}% | Herbisida ${(g/total*100).toFixed(0)}%`;
+    showWeightPreview(s, j, g);
+  } else {
+    document.getElementById('filter-hint').textContent = 'Geser slider di bawah untuk mengaktifkan kategori';
+    document.getElementById('weight-preview').style.display = 'none';
+  }
+}
+
+function showWeightPreview(s, j, g) {
+  const total = s + j + g;
+  if (total === 0) return;
+  document.getElementById('weight-preview').style.display = 'block';
+  const bars = [
+    { label:'🦟 Insektisida', w: s/total, active: s > 0, color:'#dc2626' },
+    { label:'🍄 Fungisida',   w: j/total, active: j > 0, color:'#d97706' },
+    { label:'🌿 Herbisida',   w: g/total, active: g > 0, color:'#16a34a' },
+  ];
+  document.getElementById('weight-bars').innerHTML = bars.map(b => `
+    <div class="flex items-center gap-3">
+      <span class="text-xs text-slate-500 w-24">${b.label}</span>
+      <div class="flex-1 bg-slate-200 rounded-full h-2.5 overflow-hidden">
+        <div class="h-2.5 rounded-full score-bar" style="width:${(b.w*100).toFixed(0)}%;background:${b.active ? b.color : '#cbd5e1'}"></div>
+      </div>
+      <span class="text-xs font-bold w-10 text-right" style="color:${b.active ? b.color : '#94a3b8'}">${(b.w*100).toFixed(0)}%</span>
+    </div>
+  `).join('');
+}
+
+document.getElementById('input-luas').addEventListener('input', function() {
+  const v = parseFloat(this.value) || 0;
+  const u = parseFloat(document.getElementById('unit-luas').value);
+  const m2 = v * u;
+  document.getElementById('luas-display').textContent = `= ${fmt(m2)} m² (${(m2/10000).toFixed(2)} ha)`;
+});
+document.getElementById('unit-luas').addEventListener('change', function() {
+  document.getElementById('input-luas').dispatchEvent(new Event('input'));
+});
+document.getElementById('input-budget').addEventListener('input', function() {
+  document.getElementById('budget-display').textContent = `= Rp ${fmt(parseFloat(this.value)||0)}`;
+});
+
+function fmt(n) { return Math.round(n).toLocaleString('id-ID'); }
+function fmtRp(n) { return 'Rp ' + fmt(n); }
+function pct(n) { return (n * 100).toFixed(1) + '%'; }
+
+function qLabel(q) {
+  const m = {1:'Ekonomis',2:'Standar',3:'Menengah',4:'Premium',5:'Elite'};
+  return m[q] || q;
+}
+function qBadge(q) {
+  return `<span class="badge-q${q} text-xs font-bold px-2 py-0.5 rounded-full">${qLabel(q)}</span>`;
+}
+
+function displayResults(catResults, inp) {
+  // Summary stats
+  const totalBudget = inp.budget;
+  const totalCost = catResults.reduce((s, r) => s + r.qty.totalBiaya, 0);
+  const budgetOk = totalCost <= totalBudget || totalBudget === 0;
+
+  document.getElementById('summary-stats').innerHTML = `
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 text-center shadow-sm">
+      <div class="text-3xl font-extrabold text-green-600">${catResults.length}</div>
+      <div class="text-slate-500 text-sm mt-1">Kategori Aktif</div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 text-center shadow-sm">
+      <div class="text-3xl font-extrabold text-blue-600">${catResults.reduce((s,r)=>s+r.topsis.results.length,0)}</div>
+      <div class="text-slate-500 text-sm mt-1">Produk Dievaluasi</div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 text-center shadow-sm">
+      <div class="text-3xl font-extrabold text-purple-600">${(inp.luas/10000).toFixed(2)} ha</div>
+      <div class="text-slate-500 text-sm mt-1">Luas Lahan</div>
+    </div>
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 text-center shadow-sm">
+      <div class="text-2xl font-extrabold ${budgetOk ? 'text-green-600' : 'text-red-500'}">${budgetOk ? '✅ Sesuai' : '⚠️ Melebihi'}</div>
+      <div class="text-slate-500 text-sm mt-1">Status Budget</div>
+    </div>
+  `;
+
+  // Per-category results
+  document.getElementById('category-results').innerHTML = catResults.map(cr => renderCategoryResult(cr, inp)).join('');
+
+  // Cost summary
+  renderCostSummary(catResults, inp);
+
+  // TOPSIS detail
+  document.getElementById('topsis-detail').innerHTML = catResults.map(cr => renderTOPSISDetail(cr)).join('');
+
+  // Comparison table
+  renderComparisonTable(catResults);
+}
+
+function renderCategoryResult(cr, inp) {
+  const top = cr.topsis.results[0];
+  const alts = cr.topsis.results.slice(1, 4);
+  const icon = CAT_ICONS[cr.cat];
+  const freq = getFrequency(cr.sev);
+
+  return `
+  <div class="fade-in">
+    <div class="flex items-center gap-3 mb-4">
+      <span class="text-3xl">${icon}</span>
+      <div>
+        <h3 class="text-xl font-bold text-slate-800">${cr.cat}</h3>
+        <span class="text-sm text-slate-500">Tingkat serangan: <strong style="color:${SEV_COLORS[cr.sev]}">${SEV_LABELS[cr.sev]} (${cr.sev}/5)</strong> · ${cr.topsis.results.length} produk dievaluasi</span>
+      </div>
+    </div>
+
+    <!-- MAIN RECOMMENDATION -->
+    <div class="bg-gradient-to-r from-green-700 to-green-600 rounded-3xl p-6 md:p-8 text-white shadow-xl mb-4 fade-in">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="bg-amber-400 text-amber-900 text-xs font-extrabold px-3 py-1 rounded-full">🏆 REKOMENDASI UTAMA</span>
+            ${top.product.organik ? '<span class="bg-green-300 text-green-900 text-xs font-bold px-2 py-1 rounded-full">🌱 Organik</span>' : ''}
+          </div>
+          <h3 class="text-2xl font-extrabold mt-2">${top.product.nama}</h3>
+          <div class="text-green-200 text-sm mt-1">${cr.cat} · ${top.product.ml} mL · Kualitas: ${qLabel(top.product.kualitas)}</div>
+        </div>
+        <div class="text-right">
+          <div class="text-3xl font-extrabold">${fmtRp(top.product.harga)}</div>
+          <div class="text-green-200 text-xs">per botol</div>
+          <div class="mt-2 bg-white/20 rounded-xl px-4 py-2 text-center">
+            <div class="text-xl font-extrabold">${pct(top.score)}</div>
+            <div class="text-xs text-green-200">Tingkat Kecocokan</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white/15 rounded-xl p-3 text-center">
+          <div class="font-bold text-lg">${top.product.coverage_area.toLocaleString()} m²</div>
+          <div class="text-xs text-green-200">Coverage/botol</div>
+        </div>
+        <div class="bg-white/15 rounded-xl p-3 text-center">
+          <div class="font-bold text-lg">${top.product.dosis_ml} mL/L</div>
+          <div class="text-xs text-green-200">Dosis</div>
+        </div>
+        <div class="bg-white/15 rounded-xl p-3 text-center">
+          <div class="font-bold text-lg">${freq}x</div>
+          <div class="text-xs text-green-200">Aplikasi/musim</div>
+        </div>
+        <div class="bg-white/15 rounded-xl p-3 text-center">
+          <div class="font-bold text-lg">${cr.qty.totalBotol} botol</div>
+          <div class="text-xs text-green-200">Total kebutuhan</div>
+        </div>
+      </div>
+
+      <!-- Score Bar -->
+      <div class="mt-5">
+        <div class="flex justify-between text-xs text-green-200 mb-1"><span>Tingkat Kecocokan</span><span>${pct(top.score)}</span></div>
+        <div class="bg-white/20 rounded-full h-2.5 overflow-hidden">
+          <div class="h-2.5 bg-amber-400 rounded-full score-bar" style="width:${pct(top.score)}"></div>
+        </div>
+      </div>
+
+      <!-- Reason -->
+      <div class="mt-5 bg-white/10 rounded-xl p-4 text-sm">
+        <p class="font-semibold mb-1">💡 Alasan Rekomendasi:</p>
+        <p class="text-green-100">${buildReason(top, cr)}</p>
+      </div>
+
+      <!-- Quantity detail -->
+      <div class="mt-4 text-sm bg-white/10 rounded-xl p-4">
+        <p class="font-semibold mb-2">📦 Kalkulasi Kebutuhan (Lahan ${fmt(cr.luas)} m²)</p>
+        <div class="grid grid-cols-2 gap-2 text-green-100 text-xs">
+          <span>Botol per aplikasi:</span><span class="font-bold text-white">${cr.qty.botolPerAplikasi} botol</span>
+          <span>Frekuensi (serangan ${cr.sev}/5):</span><span class="font-bold text-white">${freq}x per musim</span>
+          <span>Total botol:</span><span class="font-bold text-white">${cr.qty.totalBotol} botol</span>
+          <span>Total volume:</span><span class="font-bold text-white">${fmt(cr.qty.totalMl)} mL</span>
+          <span>Estimasi biaya:</span><span class="font-bold text-amber-300 text-sm">${fmtRp(cr.qty.totalBiaya)}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALTERNATIVES -->
+    <div class="mb-2 text-sm font-semibold text-slate-500 uppercase tracking-wider px-1">Alternatif Terbaik</div>
+    <div class="grid sm:grid-cols-3 gap-4">
+      ${alts.map((a, i) => renderAltCard(a, i + 2, cr)).join('')}
+    </div>
+  </div>
+  `;
+}
+
+function buildReason(r, cr) {
+  const p = r.product;
+  const effKey = getEffKey(cr.cat);
+  const reasons = [];
+  if (p[effKey] >= 9) reasons.push(`efektivitas sangat tinggi (${p[effKey].toFixed(1)}/10)`);
+  else if (p[effKey] >= 7) reasons.push(`efektivitas baik (${p[effKey].toFixed(1)}/10)`);
+  if (p.kualitas >= 4) reasons.push(`kualitas ${qLabel(p.kualitas)}`);
+  if (p.coverage_area > 3000) reasons.push(`coverage luas (${fmt(p.coverage_area)} m²/botol)`);
+  if (p.harga <= 75000) reasons.push(`harga ekonomis (${fmtRp(p.harga)})`);
+  else if (p.harga >= 150000) reasons.push(`nilai premium sepadan dengan performa`);
+  if (p.organik) reasons.push(`ramah lingkungan (formula organik)`);
+  const score = pct(r.score);
+  return `Produk ini sangat cocok untuk kondisi Anda karena ${reasons.join(', ')}. Penilaian dilakukan berdasarkan tingkat serangan ${SEV_LABELS[cr.sev].toLowerCase()} (${cr.sev}/5) dengan mempertimbangkan efektivitas, kualitas, jangkauan, harga, dan dosis.`;
+}
+
+function renderAltCard(a, rank, cr) {
+  const rankClass = rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'bg-slate-400';
+  const qty = calculateQuantity(a.product, cr.luas, cr.sev);
+  return `
+  <div class="bg-white rounded-2xl border border-slate-200 p-5 card-hover shadow-sm">
+    <div class="flex items-center justify-between mb-3">
+      <span class="w-7 h-7 ${rankClass} rounded-full flex items-center justify-center text-white text-xs font-bold">#${rank}</span>
+      <span class="text-xs font-semibold text-slate-400">${pct(a.score)}</span>
+    </div>
+    <h4 class="font-bold text-slate-800">${a.product.nama}</h4>
+    <div class="text-xs text-slate-500 mt-0.5">${a.product.ml} mL · ${qBadge(a.product.kualitas)}</div>
+    <div class="mt-3 space-y-1 text-xs text-slate-600">
+      <div class="flex justify-between"><span>Harga:</span><span class="font-semibold">${fmtRp(a.product.harga)}</span></div>
+      <div class="flex justify-between"><span>Coverage:</span><span>${fmt(a.product.coverage_area)} m²</span></div>
+      <div class="flex justify-between"><span>Est. biaya/musim:</span><span class="font-semibold text-green-700">${fmtRp(qty.totalBiaya)}</span></div>
+    </div>
+    <div class="mt-3 bg-slate-50 rounded-lg h-1.5 overflow-hidden">
+      <div class="h-1.5 bg-green-400 rounded-full score-bar" style="width:${pct(a.score)}"></div>
+    </div>
+  </div>
+  `;
+}
+
+function renderCostSummary(catResults, inp) {
+  const totalBiaya = catResults.reduce((s, r) => s + r.qty.totalBiaya, 0);
+  const budget = inp.budget;
+  const sisa = budget - totalBiaya;
+  const persen = budget > 0 ? Math.min(100, (totalBiaya / budget) * 100) : 0;
+  const ok = budget === 0 || totalBiaya <= budget;
+
+  document.getElementById('cost-summary').innerHTML = `
+    <h3 class="text-xl font-bold text-slate-800 mb-5">💰 Estimasi Biaya Total 1 Musim Tanam</h3>
+    <div class="grid sm:grid-cols-${catResults.length + 1} gap-4 mb-6">
+      ${catResults.map(cr => `
+        <div class="bg-slate-50 rounded-xl p-4 text-center">
+          <div class="text-sm text-slate-500 mb-1">${CAT_ICONS[cr.cat]} ${cr.cat}</div>
+          <div class="text-xl font-bold text-slate-800">${fmtRp(cr.qty.totalBiaya)}</div>
+          <div class="text-xs text-slate-400">${cr.qty.totalBotol} botol × ${fmtRp(cr.topsis.results[0].product.harga)}</div>
+        </div>
+      `).join('')}
+      <div class="bg-green-50 border-2 border-green-200 rounded-xl p-4 text-center">
+        <div class="text-sm text-green-600 font-semibold mb-1">Total Semua</div>
+        <div class="text-2xl font-extrabold text-green-700">${fmtRp(totalBiaya)}</div>
+      </div>
+    </div>
+    ${budget > 0 ? `
+    <div class="space-y-2">
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-600">Total biaya pestisida</span>
+        <span class="font-bold">${fmtRp(totalBiaya)}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-600">Budget Anda</span>
+        <span class="font-bold">${fmtRp(budget)}</span>
+      </div>
+      <div class="bg-slate-200 rounded-full h-3 mt-2">
+        <div class="h-3 rounded-full score-bar ${ok ? 'bg-green-500' : 'bg-red-500'}" style="width:${persen.toFixed(0)}%;max-width:100%"></div>
+      </div>
+      <div class="flex justify-between text-sm mt-1">
+        <span class="${ok ? 'text-green-600' : 'text-red-500'} font-semibold">
+          ${ok ? `✅ Budget tersisa ${fmtRp(sisa)}` : `⚠️ Melebihi budget ${fmtRp(-sisa)}`}
+        </span>
+        <span class="text-slate-400">${persen.toFixed(0)}% dari budget</span>
+      </div>
+    </div>` : '<p class="text-slate-400 text-sm text-center">Masukkan budget untuk melihat status anggaran</p>'}
+  `;
+}
+
+function renderTOPSISDetail(cr) {
+  const { results, criteria } = cr.topsis;
+  const top5 = results.slice(0, 5);
+  const effKey = getEffKey(cr.cat);
+
+  return `
+  <details class="bg-white rounded-3xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
+    <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-50">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">${CAT_ICONS[cr.cat]}</span>
+        <div>
+          <h3 class="font-bold text-slate-800">Lihat Peringkat Lengkap — ${cr.cat}</h3>
+          <p class="text-xs text-slate-400">Klik untuk melihat perbandingan semua produk teratas</p>
+        </div>
+      </div>
+      <span class="text-slate-400 text-lg">▼</span>
+    </summary>
+    <div class="px-6 pb-6">
+      <!-- Faktor penilaian -->
+      <div class="mb-5">
+        <p class="text-sm font-bold text-slate-600 mb-2">Faktor yang Dinilai</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full font-medium">✅ Efektivitas</span>
+          <span class="bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full font-medium">✅ Kualitas Produk</span>
+          <span class="bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full font-medium">✅ Luas Jangkauan</span>
+          <span class="bg-amber-100 text-amber-700 text-xs px-3 py-1.5 rounded-full font-medium">💰 Harga</span>
+          <span class="bg-amber-100 text-amber-700 text-xs px-3 py-1.5 rounded-full font-medium">💧 Dosis Pemakaian</span>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">Bobot faktor efektivitas meningkat sesuai tingkat keparahan serangan (${cr.sev}/5)</p>
+      </div>
+
+      <!-- Ranking table -->
+      <p class="text-sm font-bold text-slate-600 mb-2">Peringkat 5 Teratas dari ${results.length} Produk</p>
+      <div class="overflow-x-auto">
+        <table class="topsis-table w-full rounded-xl overflow-hidden">
+          <thead>
+            <tr>
+              <th>Peringkat</th>
+              <th>Nama Produk</th>
+              <th>Efektivitas</th>
+              <th>Kualitas</th>
+              <th>Jangkauan (m²)</th>
+              <th>Harga/Botol</th>
+              <th>Dosis (mL/L)</th>
+              <th>Kecocokan</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${top5.map(r => `
+              <tr class="${r.rank === 1 ? 'bg-green-50' : ''}">
+                <td class="text-center font-bold ${r.rank === 1 ? 'text-green-700' : ''}">
+                  ${r.rank === 1 ? '🏆' : '#' + r.rank}
+                </td>
+                <td class="font-medium">${r.product.nama}</td>
+                <td class="text-center">${r.product[effKey].toFixed(1)}/10</td>
+                <td class="text-center">${qLabel(r.product.kualitas)}</td>
+                <td class="text-center">${fmt(r.product.coverage_area)}</td>
+                <td class="text-center">${fmtRp(r.product.harga)}</td>
+                <td class="text-center">${r.product.dosis_ml} mL/L</td>
+                <td class="text-center font-bold text-green-700">${pct(r.score)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </details>`;
+}
+
+function renderComparisonTable(catResults) {
+  const allRecs = catResults.map(cr => ({
+    cat: cr.cat,
+    product: cr.topsis.results[0].product,
+    score: cr.topsis.results[0].score,
+    qty: cr.qty
+  }));
+
+  document.getElementById('comparison-table').innerHTML = `
+    <h3 class="text-xl font-bold text-slate-800 mb-5">📊 Perbandingan Produk Rekomendasi</h3>
+    <table class="topsis-table w-full">
+      <thead>
+        <tr>
+          <th>Kategori</th>
+          <th>Produk</th>
+          <th>Harga/botol</th>
+          <th>Volume</th>
+          <th>Kualitas</th>
+          <th>Coverage</th>
+          <th>Dosis</th>
+          <th>Kecocokan</th>
+          <th>Botol/Musim</th>
+          <th>Biaya/Musim</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${allRecs.map(r => `
+          <tr>
+            <td>${CAT_ICONS[r.cat]} ${r.cat}</td>
+            <td class="font-bold">${r.product.nama}</td>
+            <td>${fmtRp(r.product.harga)}</td>
+            <td>${r.product.ml} mL</td>
+            <td>${qBadge(r.product.kualitas)}</td>
+            <td>${fmt(r.product.coverage_area)} m²</td>
+            <td>${r.product.dosis_ml} mL/L</td>
+            <td class="font-bold text-green-700">${pct(r.score)}</td>
+            <td class="text-center">${r.qty.totalBotol}</td>
+            <td class="font-bold text-green-700">${fmtRp(r.qty.totalBiaya)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function scrollToForm() {
+  document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============================================================
+// FAQ
+// ============================================================
+const FAQS = [
+  {q:'Bagaimana sistem memilih produk yang paling cocok?', a:'Sistem menilai setiap produk dari 5 faktor sekaligus: efektivitas melawan hama, kualitas produk, luas jangkauan per botol, harga, dan dosis pemakaian. Semua faktor digabung lalu produk diurutkan dari yang paling sesuai kondisi sawah Anda.'},
+  {q:'Mengapa hanya untuk padi?', a:'Sistem ini dirancang khusus untuk sawah padi, dengan data produk pestisida, dosis, dan parameter yang disesuaikan untuk ekosistem pertanian padi Indonesia.'},
+  {q:'Kenapa ada produk yang tidak muncul di rekomendasi?', a:'Sistem hanya menampilkan produk dari kategori yang relevan. Jika Anda tidak punya masalah serangga, maka insektisida tidak akan muncul. Ini memastikan rekomendasi benar-benar sesuai masalah Anda.'},
+  {q:'Bagaimana cara menghitung jumlah botol yang dibutuhkan?', a:'Sistem menghitung berdasarkan luas lahan dan jangkauan per botol produk. Hasilnya dikalikan frekuensi penyemprotan: serangan ringan 1x, sedang 2x, berat 3x per musim tanam.'},
+  {q:'Apakah rekomendasi ini sudah pasti benar?', a:'Ini adalah panduan berbasis data produk dan analisis kondisi sawah Anda, bukan pengganti saran ahli. Selalu konsultasikan dengan penyuluh pertanian atau toko pertanian setempat untuk konfirmasi akhir.'},
+];
+document.getElementById('faq-list').innerHTML = FAQS.map((f, i) => `
+  <details class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+    <summary class="flex items-center justify-between p-5 hover:bg-slate-50 font-semibold text-slate-700">
+      <span>${f.q}</span>
+      <span class="text-slate-400 ml-4 flex-shrink-0">▼</span>
+    </summary>
+    <div class="px-5 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-100 pt-4">${f.a}</div>
+  </details>
+`).join('');
+</script>
+</body>
+</html>
