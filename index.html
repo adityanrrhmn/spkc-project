@@ -40,6 +40,205 @@
   .category-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; transition: all 0.2s; }
   .chip-active { background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; }
   .chip-inactive { background: #f1f5f9; color: #94a3b8; border: 1.5px solid #e2e8f0; text-decoration: line-through; }
+
+  /* === HELP BUTTON & MODAL === */
+  .help-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    margin-left: 6px;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .help-btn:hover {
+    background: #16a34a;
+    color: white;
+    transform: scale(1.1);
+  }
+  .help-btn::after {
+    content: 'Lihat panduan';
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .help-btn:hover::after { opacity: 1; }
+
+  .help-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    overflow-y: auto;
+    animation: overlayIn 0.2s ease-out;
+  }
+  .help-overlay.active { display: flex; }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .help-modal {
+    background: white;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 640px;
+    margin: 40px auto;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+    animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .help-modal-header {
+    padding: 24px 28px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+  }
+
+  .help-modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .help-modal-close:hover { background: #ef4444; color: white; transform: rotate(90deg); }
+
+  .help-modal-body { padding: 24px 28px 28px; }
+
+  .scale-card {
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1.5px solid;
+    transition: transform 0.15s;
+  }
+  .scale-card:hover { transform: translateX(2px); }
+  .scale-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .scale-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .scale-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #475569;
+  }
+  .scale-card ul li {
+    padding-left: 18px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .scale-card ul li::before {
+    content: '•';
+    position: absolute;
+    left: 6px;
+    font-weight: 700;
+  }
+  .scale-action {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.7);
+  }
+
+  /* Scale level colors */
+  .s0 { background:#f8fafc; border-color:#e2e8f0; }
+  .s0 .scale-badge { background:#94a3b8; }
+  .s0 .scale-action { color:#64748b; }
+  .s1 { background:#f0fdf4; border-color:#bbf7d0; }
+  .s1 .scale-badge { background:#22c55e; }
+  .s1 .scale-action { color:#15803d; }
+  .s2 { background:#f7fee7; border-color:#d9f99d; }
+  .s2 .scale-badge { background:#84cc16; }
+  .s2 .scale-action { color:#4d7c0f; }
+  .s3 { background:#fffbeb; border-color:#fde68a; }
+  .s3 .scale-badge { background:#f59e0b; }
+  .s3 .scale-action { color:#b45309; }
+  .s4 { background:#fef2f2; border-color:#fecaca; }
+  .s4 .scale-badge { background:#ef4444; }
+  .s4 .scale-action { color:#b91c1c; }
+  .s5 { background:#fef2f2; border-color:#fca5a5; }
+  .s5 .scale-badge { background:#dc2626; }
+  .s5 .scale-action { color:#991b1b; }
+
+  .help-tip-box {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border: 1.5px solid #86efac;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #15803d;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 640px) {
+    .help-modal { margin: 20px auto; border-radius: 20px; }
+    .help-modal-header, .help-modal-body { padding-left: 18px; padding-right: 18px; }
+    .help-modal-header h3 { font-size: 18px !important; }
+  }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -181,7 +380,10 @@
         <div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <label class="font-semibold text-slate-700 flex items-center gap-2">🦟 Tingkat Serangan Serangga</label>
+              <label class="font-semibold text-slate-700 flex items-center gap-1">
+                🦟 Tingkat Serangan Serangga
+                <button type="button" class="help-btn" onclick="showHelpModal('serangga')" aria-label="Panduan penilaian serangga">?</button>
+              </label>
               <p class="text-xs text-slate-400 mt-0.5">Wereng, penggerek batang, ulat, dll.</p>
             </div>
             <div class="text-right">
@@ -198,7 +400,10 @@
         <div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <label class="font-semibold text-slate-700 flex items-center gap-2">🍄 Tingkat Serangan Jamur/Penyakit</label>
+              <label class="font-semibold text-slate-700 flex items-center gap-1">
+                🍄 Tingkat Serangan Jamur/Penyakit
+                <button type="button" class="help-btn" onclick="showHelpModal('jamur')" aria-label="Panduan penilaian jamur">?</button>
+              </label>
               <p class="text-xs text-slate-400 mt-0.5">Blas, hawar batang, karat daun, dll.</p>
             </div>
             <div class="text-right">
@@ -215,7 +420,10 @@
         <div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <label class="font-semibold text-slate-700 flex items-center gap-2">🌿 Tingkat Gulma</label>
+              <label class="font-semibold text-slate-700 flex items-center gap-1">
+                🌿 Tingkat Gulma
+                <button type="button" class="help-btn" onclick="showHelpModal('gulma')" aria-label="Panduan penilaian gulma">?</button>
+              </label>
               <p class="text-xs text-slate-400 mt-0.5">Rumput liar, eceng gondok, teki, dll.</p>
             </div>
             <div class="text-right">
@@ -337,7 +545,325 @@
   <p class="text-xs mt-2 text-slate-600">Data produk dari katalog pestisida terdaftar. Konsultasikan dengan penyuluh pertanian setempat.</p>
 </footer>
 
+<!-- ============================================================ -->
+<!-- HELP MODAL                                                    -->
+<!-- ============================================================ -->
+<div class="help-overlay" id="help-overlay" onclick="closeHelpOnBackdrop(event)">
+  <div class="help-modal" id="help-modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="help-modal-header">
+      <div>
+        <p class="text-xs font-bold text-green-600 uppercase tracking-wider mb-1" id="help-eyebrow">Panduan Penilaian</p>
+        <h3 class="text-xl font-extrabold text-slate-800" id="help-title">Judul</h3>
+        <p class="text-sm text-slate-500 mt-1" id="help-subtitle">Subtitle</p>
+      </div>
+      <button type="button" class="help-modal-close" onclick="closeHelpModal()" aria-label="Tutup">✕</button>
+    </div>
+    <div class="help-modal-body" id="help-body"></div>
+  </div>
+</div>
+
 <script>
+// ============================================================
+// HELP / GUIDANCE DATA — Panduan Penilaian Parameter Padi
+// ============================================================
+const HELP_DATA = {
+  serangga: {
+    title: '🦟 Tingkat Serangan Serangga',
+    subtitle: 'Cara menilai populasi hama serangga di sawah padi Anda',
+    tip: '💡 <strong>Cara pengamatan:</strong> Ambil contoh acak minimal 10 rumpun padi di beberapa titik berbeda (pojok dan tengah lahan). Hitung jumlah hama per rumpun, lalu ambil rata-ratanya. Pengamatan terbaik dilakukan pagi hari (06.00–09.00) saat serangga masih aktif dan belum sembunyi.',
+    scales: [
+      {
+        level: 0,
+        label: 'Tidak Ada',
+        conditions: [
+          'Tidak ditemukan hama saat pengamatan 10 rumpun',
+          'Daun terlihat hijau sehat tanpa bekas gigitan',
+          'Tidak ada bercak putih, hopperburn, atau anakan mati',
+          'Tidak ada walang sangit yang terbang saat lahan diguncang'
+        ],
+        action: 'Tidak perlu insektisida. Cukup pengamatan rutin setiap 3–5 hari.'
+      },
+      {
+        level: 1,
+        label: 'Sangat Ringan',
+        conditions: [
+          '1–2 ekor wereng coklat per rumpun (rata-rata dari 10 rumpun)',
+          '1–2 helai daun ada bekas gigitan kecil dari 20 daun yang diperiksa',
+          'Belum ada gejala sundep (anakan mati di pucuk)',
+          '0–1 walang sangit per 20 rumpun saat pengamatan pagi',
+          'Belum ada beluk (malai hampa)'
+        ],
+        action: 'Pengendalian preventif. Bisa pakai insektisida ekonomis dengan dosis ringan.'
+      },
+      {
+        level: 2,
+        label: 'Ringan',
+        conditions: [
+          '3–5 ekor wereng per rumpun',
+          '3–5 helai daun ada bekas gigitan dari 20 daun (sekitar 15–25%)',
+          'Ditemukan 1–2 sundep per m² (anakan dengan pucuk mati/kering)',
+          '2–3 walang sangit per 20 rumpun',
+          'Beberapa daun mulai terlihat kuning di tepinya'
+        ],
+        action: 'Aplikasi insektisida preventif menyeluruh, 1 kali penyemprotan.'
+      },
+      {
+        level: 3,
+        label: 'Sedang',
+        conditions: [
+          '6–10 ekor wereng per rumpun, terlihat di sebagian besar rumpun',
+          '25–50% daun memiliki bekas gigitan',
+          '3–5 sundep per m², anakan mulai banyak yang mati',
+          '4–6 walang sangit per 20 rumpun',
+          'Mulai terlihat bercak menguning kecil di beberapa titik lahan (≤ 1 m²)',
+          'Mulai muncul beluk (malai hampa) saat sudah keluar bulir'
+        ],
+        action: 'Aplikasi insektisida segera dengan dosis penuh. Ulang setelah 7–10 hari.'
+      },
+      {
+        level: 4,
+        label: 'Berat',
+        conditions: [
+          'Lebih dari 10 wereng per rumpun, populasi terlihat padat',
+          'Hopperburn mulai terlihat — area menguning/coklat berukuran 1–5 m²',
+          'Lebih dari 5 sundep per m², banyak anakan rusak/mati',
+          '50–70% area lahan menunjukkan gejala serangan',
+          'Banyak walang sangit (>6 per 20 rumpun) saat tahap pengisian bulir',
+          'Daun banyak yang menggulung dan mengering'
+        ],
+        action: 'Aplikasi insektisida intensif dengan dosis penuh. Kombinasi 2 bahan aktif berbeda direkomendasikan, ulang tiap 5–7 hari.'
+      },
+      {
+        level: 5,
+        label: 'Sangat Berat',
+        conditions: [
+          'Hopperburn merata — area menguning/mati >5 m² atau lebih dari 20% lahan',
+          'Lebih dari 70% tanaman menunjukkan kerusakan parah',
+          'Banyak malai hampa atau bulir tidak terisi (beluk masif)',
+          'Anakan mati massal — populasi rumpun produktif menurun drastis',
+          'Berisiko gagal panen lebih dari 50% jika tidak segera ditangani'
+        ],
+        action: 'Aplikasi intensif segera dengan insektisida premium. Kombinasi metode (kimiawi + mekanis) sangat disarankan. Konsultasi penyuluh.'
+      }
+    ]
+  },
+
+  jamur: {
+    title: '🍄 Tingkat Serangan Jamur/Penyakit',
+    subtitle: 'Cara menilai infeksi jamur dan penyakit pada padi Anda',
+    tip: '💡 <strong>Cara pengamatan:</strong> Periksa 20 daun secara acak dari 10 rumpun di titik berbeda. Hitung berapa daun yang memiliki bercak, lalu hitung persentasenya. Periksa juga batang dan pelepah. Penyakit utama yang dipantau: <em>Blas</em> (bercak belah ketupat), <em>Hawar Daun Bakteri/BLB</em> (garis kuning di tepi daun), <em>Bercak Coklat</em>, dan <em>Busuk Pelepah</em>.',
+    scales: [
+      {
+        level: 0,
+        label: 'Tidak Ada',
+        conditions: [
+          'Tidak ada bercak, lesi, atau perubahan warna pada 20 daun yang diperiksa',
+          'Pelepah dan batang bersih, tidak ada lesi coklat',
+          'Tidak ada gejala layu atau busuk'
+        ],
+        action: 'Tidak perlu fungisida. Jaga drainase dan pemupukan seimbang.'
+      },
+      {
+        level: 1,
+        label: 'Sangat Ringan',
+        conditions: [
+          'Kurang dari 5% daun (1 dari 20) ada bercak kecil',
+          'Bercak masih sangat kecil (< 3 mm), titik-titik coklat tersebar',
+          'Hanya ditemukan di 1–2 rumpun dari 10 rumpun yang diamati',
+          'Tidak ada bercak di pelepah atau batang'
+        ],
+        action: 'Pengendalian preventif ringan. Fungisida ekonomis sudah cukup.'
+      },
+      {
+        level: 2,
+        label: 'Ringan',
+        conditions: [
+          '5–15% daun terinfeksi (1–3 daun dari 20)',
+          'Bercak masih kecil 3–5 mm, belum menyatu',
+          'Ditemukan di 3–4 rumpun dari 10 rumpun',
+          'Belum ada lesi di pelepah atau batang',
+          'Belum ada daun yang mati total'
+        ],
+        action: 'Aplikasi fungisida standar 1 kali. Tingkatkan ventilasi tanaman dengan pengaturan jarak.'
+      },
+      {
+        level: 3,
+        label: 'Sedang',
+        conditions: [
+          '15–30% daun terinfeksi (3–6 daun dari 20)',
+          'Bercak mulai membesar 5–10 mm, beberapa mulai menyatu',
+          'Ditemukan di lebih dari 50% rumpun yang diperiksa',
+          'Mulai ada lesi kecil di pelepah daun',
+          'Daun bawah mulai mengering total di beberapa tanaman'
+        ],
+        action: 'Aplikasi fungisida segera, dosis penuh. Ulang 7–10 hari kemudian. Kurangi pupuk nitrogen sementara.'
+      },
+      {
+        level: 4,
+        label: 'Berat',
+        conditions: [
+          '30–60% daun terinfeksi (6–12 daun dari 20)',
+          'Bercak menyatu membentuk area mati besar (>1 cm)',
+          'Lesi muncul di batang dan pelepah, beberapa terlihat membusuk',
+          'Daun atas (bendera) sudah mulai terinfeksi',
+          'Tanaman terlihat layu/mengering dari kejauhan',
+          'Mulai muncul gejala neck blast (malai mengering di leher)'
+        ],
+        action: 'Aplikasi fungisida intensif dengan bahan aktif sistemik. Mungkin perlu 2–3 kali aplikasi.'
+      },
+      {
+        level: 5,
+        label: 'Sangat Berat',
+        conditions: [
+          'Lebih dari 60% daun terinfeksi parah',
+          'Malai banyak yang mengering (neck blast masif)',
+          'Banyak tanaman mati atau rebah karena busuk pelepah',
+          'Bercak besar menutupi >50% permukaan daun',
+          'Risiko gagal panen sangat tinggi (>50% produksi terancam)',
+          'Penyebaran sangat cepat — bisa meluas dalam 3–5 hari'
+        ],
+        action: 'Aplikasi fungisida premium sistemik segera. Konsultasi penyuluh pertanian wajib.'
+      }
+    ]
+  },
+
+  gulma: {
+    title: '🌿 Tingkat Gulma',
+    subtitle: 'Cara menilai populasi gulma di sawah padi Anda',
+    tip: '💡 <strong>Cara pengamatan:</strong> Buat petak kecil 1 m × 1 m (1 m²) di 5 titik berbeda di lahan Anda, lalu hitung jumlah gulma dalam setiap petak. Ambil nilai rata-rata. Gulma utama yang sering muncul: <em>jajagoan/Echinochloa</em> (mirip padi), <em>teki/Cyperus</em>, <em>eceng gondok</em>, dan <em>rumput grinting</em>.',
+    scales: [
+      {
+        level: 0,
+        label: 'Tidak Ada',
+        conditions: [
+          'Tidak ditemukan gulma di petak 1 m × 1 m',
+          'Lahan bersih, hanya tanaman padi yang terlihat',
+          'Air sawah jernih tanpa tumbuhan liar mengambang'
+        ],
+        action: 'Tidak perlu herbisida. Cukup penyiangan manual jika ada gulma kecil di kemudian hari.'
+      },
+      {
+        level: 1,
+        label: 'Sangat Ringan',
+        conditions: [
+          'Kurang dari 5 gulma per m² (rata-rata)',
+          'Gulma masih kecil (tinggi < 10 cm), belum berbiji',
+          'Hanya ditemukan di 1–2 petak dari 5 petak yang diperiksa',
+          'Belum ada eceng gondok atau gulma air',
+          'Belum mengganggu pertumbuhan padi'
+        ],
+        action: 'Penyiangan manual atau herbisida ringan/ekonomis sudah cukup.'
+      },
+      {
+        level: 2,
+        label: 'Ringan',
+        conditions: [
+          '5–15 gulma per m²',
+          'Tinggi gulma sekitar 10–20 cm (di bawah ketinggian padi)',
+          'Mulai terlihat menyebar di sebagian besar petak (3–4 dari 5 petak)',
+          'Sebagian gulma mulai berbunga tapi belum berbiji',
+          'Belum bersaing serius dengan padi (jarak masih terlihat)'
+        ],
+        action: 'Aplikasi herbisida selektif 1 kali. Pilih yang aman untuk padi (post-emergence).'
+      },
+      {
+        level: 3,
+        label: 'Sedang',
+        conditions: [
+          '15–30 gulma per m²',
+          'Tinggi gulma setara atau hampir setara dengan padi (20–40 cm)',
+          'Tersebar merata di seluruh petak yang diperiksa',
+          'Mulai ada gulma yang berbiji — risiko penyebaran ke musim depan',
+          'Pertumbuhan padi mulai terhambat (anakan lebih sedikit dari normal)',
+          'Beberapa gulma air (eceng) mulai muncul di petakan tergenang'
+        ],
+        action: 'Aplikasi herbisida selektif dosis penuh segera. Pertimbangkan kombinasi dengan penyiangan manual.'
+      },
+      {
+        level: 4,
+        label: 'Berat',
+        conditions: [
+          '30–50 gulma per m²',
+          'Tinggi gulma sudah melebihi padi (>40 cm)',
+          'Gulma menutupi 30–50% permukaan lahan dari pandangan atas',
+          'Banyak gulma yang sudah berbiji penuh',
+          'Pertumbuhan padi jelas terhambat — anakan kurang, daun pucat',
+          'Eceng gondok atau gulma air mendominasi area tergenang'
+        ],
+        action: 'Aplikasi herbisida sistemik dosis penuh. Kombinasi penyiangan manual sangat disarankan. Ulang tiap 14 hari.'
+      },
+      {
+        level: 5,
+        label: 'Sangat Berat',
+        conditions: [
+          'Lebih dari 50 gulma per m²',
+          'Gulma mendominasi lahan — menutupi >50% permukaan',
+          'Padi sulit terlihat dari kejauhan karena tertutup gulma',
+          'Hampir semua gulma sudah berbiji penuh',
+          'Anakan padi sangat sedikit dan kerdil — risiko hasil panen anjlok 40% atau lebih',
+          'Aliran air sawah tersumbat oleh akar gulma'
+        ],
+        action: 'Aplikasi herbisida premium sistemik segera, kombinasi penyiangan manual berat. Konsultasi penyuluh untuk strategi reklamasi lahan.'
+      }
+    ]
+  }
+};
+
+// ============================================================
+// HELP MODAL FUNCTIONS
+// ============================================================
+function showHelpModal(type) {
+  const data = HELP_DATA[type];
+  if (!data) return;
+
+  document.getElementById('help-title').textContent = data.title;
+  document.getElementById('help-subtitle').textContent = data.subtitle;
+
+  const bodyHTML = `
+    <div class="help-tip-box">${data.tip}</div>
+    ${data.scales.map(s => `
+      <div class="scale-card s${s.level}">
+        <div class="scale-card-header">
+          <div class="scale-badge">${s.level}</div>
+          <div>
+            <div class="font-bold text-slate-800">Skala ${s.level} — ${s.label}</div>
+            <div class="text-xs text-slate-500">Kondisi lapangan:</div>
+          </div>
+        </div>
+        <ul>
+          ${s.conditions.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+        <div class="scale-action">✓ Tindakan: ${s.action}</div>
+      </div>
+    `).join('')}
+    <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 leading-relaxed">
+      ⚠️ <strong>Catatan:</strong> Panduan ini adalah pendekatan umum. Kondisi aktual dapat bervariasi tergantung varietas padi, musim, dan kondisi cuaca. Untuk kasus serius, konsultasikan dengan penyuluh pertanian (PPL) setempat.
+    </div>
+  `;
+  document.getElementById('help-body').innerHTML = bodyHTML;
+
+  const overlay = document.getElementById('help-overlay');
+  overlay.classList.add('active');
+  overlay.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHelpModal() {
+  document.getElementById('help-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeHelpOnBackdrop(event) {
+  if (event.target.id === 'help-overlay') closeHelpModal();
+}
+
+// Tutup modal dengan tombol Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('help-overlay').classList.contains('active')) {
+    closeHelpModal();
+  }
+});
+
 // ============================================================
 // PRODUCT DATA — derived from Excel: Data Pestisida (Benar).xlsx
 // ============================================================
@@ -1017,6 +1543,7 @@ function scrollToForm() {
 const FAQS = [
   {q:'Bagaimana sistem memilih produk yang paling cocok?', a:'Sistem menilai setiap produk dari 5 faktor sekaligus: efektivitas melawan hama, kualitas produk, luas jangkauan per botol, harga, dan dosis pemakaian. Semua faktor digabung lalu produk diurutkan dari yang paling sesuai kondisi sawah Anda.'},
   {q:'Mengapa hanya untuk padi?', a:'Sistem ini dirancang khusus untuk sawah padi, dengan data produk pestisida, dosis, dan parameter yang disesuaikan untuk ekosistem pertanian padi Indonesia.'},
+  {q:'Bagaimana cara menentukan tingkat serangan dengan benar?', a:'Klik tombol tanda tanya (?) di samping setiap parameter (Serangga, Jamur, Gulma) untuk melihat panduan lengkap. Panduan berisi cara pengamatan, contoh kondisi nyata di lapangan untuk setiap skala 0–5, dan rekomendasi tindakan yang sesuai.'},
   {q:'Kenapa ada produk yang tidak muncul di rekomendasi?', a:'Sistem hanya menampilkan produk dari kategori yang relevan. Jika Anda tidak punya masalah serangga, maka insektisida tidak akan muncul. Ini memastikan rekomendasi benar-benar sesuai masalah Anda.'},
   {q:'Bagaimana cara menghitung jumlah botol yang dibutuhkan?', a:'Sistem menghitung berdasarkan luas lahan dan jangkauan per botol produk. Hasilnya dikalikan frekuensi penyemprotan: serangan ringan 1x, sedang 2x, berat 3x per musim tanam.'},
   {q:'Apakah rekomendasi ini sudah pasti benar?', a:'Ini adalah panduan berbasis data produk dan analisis kondisi sawah Anda, bukan pengganti saran ahli. Selalu konsultasikan dengan penyuluh pertanian atau toko pertanian setempat untuk konfirmasi akhir.'},
